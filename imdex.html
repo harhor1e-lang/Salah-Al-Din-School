@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أعدادية صلاح الدين للبنين | المنصة السحابية الفاخرة Elite 3D</title>
+    <script src="https://cdn.tailwindcss.com?v=2026.1"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;700;900&family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            overflow-x: hidden;
+            cursor: default;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .title-font { font-family: 'Reem Kufi', sans-serif; }
+
+        /* خلفية الجزيئات الحية المتحركة 24/7 */
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 550px; height: 550px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(138, 43, 226, 0.05) 40%, rgba(3, 3, 5, 0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .dark body { background-color: #030305; color: #F1F5F9; }
+        .dark .theme-panel {
+            background: linear-gradient(135deg, rgba(15, 20, 32, 0.92) 0%, rgba(5, 7, 12, 0.96) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.95), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+        }
+        .dark .theme-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* 3D Elite Lighting & Tilt Effect */
+        .theme-card {
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+        .theme-card:hover {
+            transform: translateY(-6px) rotateX(4deg) rotateY(-2deg) scale(1.015);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.25), 0 0 25px rgba(168, 85, 247, 0.15);
+            border-color: rgba(245, 217, 138, 0.7);
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFFDF0 0%, #F5D98A 30%, #D4AF37 60%, #AA771C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.2));
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* شريط التحكم العائم المصغر والأنيق */
+        .floating-command-dock {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.25);
+            padding: 7px 14px;
+            border-radius: 50px;
+            max-width: 95vw;
+            background: rgba(8, 12, 20, 0.92);
+        }
+
+        #cinematic-intro {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #030305;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 1.2s;
+        }
+        .fade-out { opacity: 0; visibility: hidden; }
+    </style>
+
+    <style id="premium-school-theme">
+        :root {
+            --gold: #d8b45a;
+            --gold-bright: #f5d98a;
+            --ink: #080b12;
+            --muted: #9aa5b5;
+            --glass: rgba(16, 22, 34, .72);
+        }
+        html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+        body {
+            background:
+                radial-gradient(ellipse at 12% 8%, rgba(40,76,105,.28), transparent 34%),
+                radial-gradient(ellipse at 90% 32%, rgba(145,105,38,.18), transparent 30%),
+                radial-gradient(ellipse at 50% 85%, rgba(88,28,135,.12), transparent 45%),
+                linear-gradient(145deg,#06080e 0%,#0c121d 48%,#06080e 100%) !important;
+            color: #eef3fb;
+        }
+        body::before {
+            content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.18;
+            background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+            background-size:54px 54px; mask-image:linear-gradient(to bottom,black,transparent 85%);
+        }
+        #particle-canvas { opacity:.55; }
+        #cursor-glow { background:radial-gradient(circle,rgba(216,180,90,.15),rgba(147,51,234,.08),transparent 68%); mix-blend-mode:screen; }
+        .theme-panel {
+            position:relative; overflow:hidden; border-radius:28px !important;
+            background:linear-gradient(145deg,rgba(22,32,48,.92),rgba(10,16,26,.92)) !important;
+            border:1px solid rgba(216,180,90,.28) !important;
+            box-shadow:0 30px 80px rgba(0,0,0,.35),inset 0 1px 1px rgba(255,255,255,.09) !important;
+            backdrop-filter:blur(25px) saturate(140%);
+            transform-style:preserve-3d;
+        }
+        .theme-panel::before {
+            content:"";position:absolute;inset:0 12% auto;height:1px;
+            background:linear-gradient(90deg,transparent,rgba(245,217,138,.75),transparent);pointer-events:none;
+        }
+        .hero-shell::marker {content:"";}
+        .hero-shell, .theme-panel {--pointer-x:50%;--pointer-y:50%;}
+        .theme-panel::after {
+            content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;
+            background:radial-gradient(400px circle at var(--pointer-x) var(--pointer-y),rgba(236,204,133,.1),transparent 70%);
+        }
+        .theme-panel:hover::after {opacity:1;}
+        button {position:relative;overflow:hidden;}
+        button.tap-wave::after {
+            content:"";position:absolute;left:var(--tap-x);top:var(--tap-y);width:8px;height:8px;border-radius:50%;
+            background:rgba(255,255,255,.35);transform:translate(-50%,-50%) scale(0);
+            animation:tapWave .55s ease-out forwards;pointer-events:none;
+        }
+        @keyframes tapWave {to{transform:translate(-50%,-50%) scale(24);opacity:0;}}
+        .theme-card {
+            border-radius:18px !important;
+            background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.02)) !important;
+            border:1px solid rgba(255,255,255,.1) !important;
+            box-shadow:0 10px 30px rgba(0,0,0,.18);
+            backdrop-filter:blur(16px);
+            transition:transform .4s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .4s,background .4s;
+        }
+        .theme-card:hover {
+            transform:translateY(-6px) rotateX(3deg);
+            border-color:rgba(216,180,90,.6) !important;
+            box-shadow:0 22px 42px rgba(0,0,0,.3),0 0 28px rgba(216,180,90,.12) !important;
+        }
+        button,a,input,textarea,select { -webkit-tap-highlight-color:transparent; }
+        button,a { transition:transform .25s ease,filter .25s ease,box-shadow .25s ease; }
+        button:hover,a:hover { filter:brightness(1.15); }
+        button:active,a:active { transform:scale(.96); }
+        input,textarea,select {
+            border-radius:14px !important; border-color:rgba(216,180,90,.25) !important;
+            background-color:rgba(3,7,13,.65) !important; color:#f3f6fb !important;
+        }
+        input:focus,textarea:focus,select:focus {
+            outline:none !important; border-color:rgba(245,217,138,.85) !important;
+            box-shadow:0 0 0 4px rgba(216,180,90,.12),0 0 25px rgba(216,180,90,.15) !important;
+        }
+        header { padding-top:24px !important; }
+        header > div:first-child > div:first-child {
+            background:linear-gradient(145deg,#f6dc9a,#98712b) !important;
+            box-shadow:0 12px 35px rgba(216,180,90,.3),inset 0 1px 0 rgba(255,255,255,.8);
+            animation:none !important;
+        }
+        header > div:first-child > div:first-child span { color:#121722 !important; -webkit-text-fill-color:#121722; }
+        .gold-gradient-text {
+            background:linear-gradient(110deg,#fff5d6 0%,#e7c36e 38%,#b88734 68%,#f5df9d 100%);
+            background-size:220% auto; animation:goldFlow 8s linear infinite;
+            -webkit-background-clip:text; background-clip:text;
+        }
+        @keyframes goldFlow { to { background-position:220% center; } }
+        .floating-command-dock {
+            border:1px solid rgba(230,195,112,.35) !important;
+            background:rgba(8,13,22,.88) !important;
+            box-shadow:0 18px 55px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12) !important;
+            backdrop-filter:blur(28px) saturate(160%);
+        }
+        .marquee-container { background:linear-gradient(90deg,#9e762c,#f2d17c 45%,#b88c3d) !important; }
+        .marquee-content { animation-duration:34s; }
+        .hero-stage { padding-top:18px; padding-bottom:12px; perspective:1400px; }
+        .hero-shell {
+            min-height:450px;position:relative;overflow:hidden;isolation:isolate;border-radius:36px;
+            display:grid;grid-template-columns:1.08fr .92fr;align-items:center;gap:24px;
+            padding:clamp(28px,5vw,64px);
+            background:linear-gradient(115deg,rgba(22,34,52,.98),rgba(10,17,28,.96) 58%,rgba(38,30,18,.94));
+            border:1px solid rgba(226,190,104,.38);
+            box-shadow:0 40px 100px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,255,255,.15);
+            transform-style:preserve-3d;
+        }
+        .hero-shell::before {
+            content:"";position:absolute;inset:0;z-index:-1;opacity:.28;
+            background:linear-gradient(120deg,transparent 15%,rgba(255,255,255,.12) 50%,transparent 65%);
+            transform:translateX(-100%);animation:heroShine 9s ease-in-out infinite;
+        }
+        .hero-shell::after {
+            content:"";position:absolute;inset:12px;border:1px solid rgba(255,255,255,.07);
+            border-radius:28px;pointer-events:none;
+        }
+        @keyframes heroShine { 0%,55%{transform:translateX(-100%)} 80%,100%{transform:translateX(100%)} }
+        .hero-content {position:relative;z-index:2;max-width:650px;animation:riseIn .9s .15s both;}
+        .hero-badge {
+            display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border-radius:99px;
+            border:1px solid rgba(231,195,110,.35);background:rgba(216,180,90,.1);
+            color:#f1d692;font-size:11px;font-weight:800;letter-spacing:.3px;
+            box-shadow:0 4px 15px rgba(216,180,90,.12);
+        }
+        .hero-live-dot {width:7px;height:7px;border-radius:50%;background:#7cdbad;box-shadow:0 0 0 5px rgba(124,219,173,.15),0 0 16px #7cdbad;}
+        .hero-overline {margin-top:25px;color:#c5a75f;font-size:13px;font-weight:800;letter-spacing:2px;}
+        .hero-heading {font-size:clamp(38px,5.5vw,68px);line-height:1.28;font-weight:900;margin-top:8px;color:#f4f5f7;letter-spacing:-1.5px;}
+        .hero-heading span {color:#e6c477;text-shadow:0 8px 35px rgba(216,180,90,.25);}
+        .hero-description {max-width:520px;margin-top:16px;color:#aeb9c8;font-size:14px;line-height:2.1;}
+        .hero-actions {display:flex;flex-wrap:wrap;gap:12px;margin-top:27px;}
+        .hero-primary,.hero-secondary {padding:13px 22px;border-radius:15px;font-size:12px;font-weight:900;}
+        .hero-primary {color:#111722;background:linear-gradient(115deg,#f5df9d,#cf9f45);box-shadow:0 14px 32px rgba(201,156,70,.28);}
+        .hero-primary span {margin-right:12px;font-size:17px;}
+        .hero-secondary {color:#e9edf4;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);}
+        .hero-meta {display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:27px;color:#8f9bab;font-size:10px;font-weight:700;}
+        .hero-meta i {width:3px;height:3px;border-radius:50%;background:#d6b25f;}
+        .hero-visual {min-height:340px;position:relative;display:grid;place-items:center;perspective:1100px;animation:riseIn 1.1s .35s both;}
+        .hero-ring {position:absolute;border:1px solid rgba(226,190,104,.22);border-radius:50%;transform:rotateX(66deg) rotateZ(-22deg);}
+        .ring-one {width:370px;height:370px;animation:orbit 22s linear infinite;}
+        .ring-two {width:300px;height:300px;border-style:dashed;animation:orbit 30s linear infinite reverse;}
+        @keyframes orbit {to{transform:rotateX(66deg) rotateZ(338deg)}}
+        
+        /* 3D Glass Card Elite */
+        .hero-glass-card {
+            width:min(295px,75vw);height:350px;position:relative;z-index:1;padding:22px 24px;
+            border-radius:26px;transform:rotateY(-16deg) rotateX(8deg);
+            background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.04) 40%,rgba(216,180,90,.12));
+            border:1px solid rgba(245,217,138,.5);box-shadow:30px 35px 75px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.35);
+            backdrop-filter:blur(22px);transition:transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;
+        }
+        .hero-shell:hover .hero-glass-card {transform:rotateY(-4deg) rotateX(2deg) translateY(-8px); box-shadow:35px 45px 85px rgba(0,0,0,.6), 0 0 35px rgba(216,180,90,.2);}
+        .hero-card-top,.hero-card-footer {display:flex;justify-content:space-between;align-items:center;color:#c5b58e;font-size:9px;font-weight:800;letter-spacing:1.4px;}
+        .hero-mini-mark {width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:linear-gradient(145deg,#f5dc9d,#a77a2f);color:#121722;font-size:17px;font-weight:900;box-shadow:0 4px 10px rgba(0,0,0,.3);}
+        .hero-crest {
+            width:150px;height:150px;margin:32px auto 17px;display:grid;place-items:center;
+            border-radius:42% 42% 48% 48%;border:1px solid rgba(244,215,151,.75);
+            background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.25),transparent 35%),linear-gradient(145deg,rgba(216,180,90,.28),rgba(8,14,22,.6));
+            box-shadow:0 0 0 10px rgba(216,180,90,.05),0 0 55px rgba(216,180,90,.18),inset 0 0 30px rgba(216,180,90,.18);
+            transform:rotate(-8deg);
+        }
+        .hero-crest span {font-family:'Reem Kufi',sans-serif;font-size:90px;font-weight:900;color:#f0d58e;text-shadow:0 10px 30px rgba(0,0,0,.5);transform:rotate(8deg);}
+        .hero-card-name {text-align:center;color:#f1d99d;font-size:19px;font-weight:900;letter-spacing:3px;}
+        .hero-card-sub {text-align:center;color:#a8b0bd;font-size:7px;letter-spacing:2px;margin-top:3px;}
+        .hero-card-line {height:1px;margin:17px 0;background:linear-gradient(90deg,transparent,rgba(230,195,112,.7),transparent);}
+        .hero-float-chip {position:absolute;z-index:2;padding:11px 15px;border-radius:14px;color:#f1da9f;font-size:10px;font-weight:800;background:rgba(13,21,32,.9);border:1px solid rgba(226,190,104,.35);box-shadow:0 18px 35px rgba(0,0,0,.38);backdrop-filter:blur(18px);animation:floatChip 5s ease-in-out infinite;}
+        .chip-top {top:18%;right:2%;}.chip-bottom {bottom:16%;left:0;animation-delay:-2.5s;}
+        @keyframes floatChip {50%{transform:translateY(-14deg) rotate(3deg)}}
+        .hero-scroll-hint {display:flex;justify-content:center;align-items:center;gap:10px;color:#778394;font-size:10px;padding:19px 0 4px;}
+        .hero-scroll-hint span {height:25px;width:15px;border:1px solid rgba(216,180,90,.5);border-radius:20px;position:relative;}
+        .hero-scroll-hint span::after {content:"";position:absolute;top:5px;left:5px;width:3px;height:5px;border-radius:4px;background:#e6c477;animation:scrollDot 1.5s infinite;}
+        @keyframes scrollDot {to{transform:translateY(8px);opacity:0}}
+        @keyframes riseIn {from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+        #cinematic-intro {
+            overflow:hidden;background:radial-gradient(ellipse at center, #182234 0%,#090e17 54%,#03060b 100%);
+            isolation:isolate;
+        }
+        .intro-grid {position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(235,203,132,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(235,203,132,.12) 1px,transparent 1px);background-size:48px 48px;transform:perspective(500px) rotateX(58deg) scale(1.8) translateY(18%);transform-origin:bottom;}
+        .intro-orbit {position:absolute;width:min(70vw,600px);height:min(70vw,600px);border:1px solid rgba(232,197,112,.16);border-radius:50%;box-shadow:0 0 80px rgba(216,180,90,.06),inset 0 0 60px rgba(216,180,90,.04);}
+        .intro-orbit-one {animation:introOrbit 18s linear infinite;transform:rotateX(65deg) rotateZ(0deg);}
+        .intro-orbit-two {width:min(48vw,410px);height:min(48vw,410px);border-style:dashed;animation:introOrbit 26s linear infinite reverse;}
+        @keyframes introOrbit {to{transform:rotateX(65deg) rotateZ(360deg)}}
+        .intro-emblem {width:86px;height:86px;display:grid;place-items:center;border-radius:26px;border:1px solid rgba(244,216,151,.6);background:linear-gradient(145deg,#f1d38b,#9d742f);box-shadow:0 0 0 10px rgba(216,180,90,.06),0 0 65px rgba(216,180,90,.23);animation:emblemIn 1s cubic-bezier(.2,.8,.2,1) both;transform:rotate(-8deg);}
+        .intro-emblem span {font-family:'Reem Kufi',sans-serif;font-size:58px;font-weight:900;color:#111722;transform:rotate(8deg);}
+        @keyframes emblemIn {from{opacity:0;transform:translateY(30px) rotate(-30deg) scale(.6)}to{opacity:1;transform:translateY(0) rotate(-8deg) scale(1)}}
+        .intro-copy {position:relative;z-index:2;margin-top:30px;animation:riseIn 1s .3s both;}
+        .intro-kicker {font-size:10px;letter-spacing:4px;color:#c7a85f;font-weight:800;}
+        .intro-title {font-size:clamp(26px,5vw,52px);font-weight:900;color:#f7f3e9;margin-top:13px;text-shadow:0 10px 35px rgba(0,0,0,.5);}
+        .intro-subtitle {font-size:11px;color:#aeb9c8;margin-top:12px;letter-spacing:2px;}
+        .intro-progress {height:2px;width:min(230px,60vw);margin:28px auto 0;background:rgba(255,255,255,.1);overflow:hidden;}
+        .intro-progress span {display:block;height:100%;background:linear-gradient(90deg,transparent,#f0d58e,transparent);animation:introLoad 2.4s ease-in-out both;}
+        @keyframes introLoad {from{width:0;margin-right:100%}to{width:100%;margin-right:0}}
+        .intro-enter {font-size:10px;color:#d5c18e;margin-top:15px;letter-spacing:2px;opacity:.8;}
+        .intro-bottom {position:absolute;bottom:26px;color:rgba(218,194,138,.35);font-size:8px;letter-spacing:3px;text-align:center;width:100%;}
+        .fade-out {opacity:0;visibility:hidden;pointer-events:none;}
+        main > section, main > div {animation:riseIn .7s both;animation-timeline:view();animation-range:entry 0% entry 18%;}
+        main > section:nth-of-type(2) {animation-delay:.06s;}
+        ::selection {background:rgba(216,180,90,.35);color:white;}
+        @media (max-width:800px) {
+            .hero-shell {grid-template-columns:1fr;min-height:unset;padding:30px 24px 22px;text-align:center;gap:4px;}
+            .hero-content {margin:auto;}
+            .hero-badge {font-size:9px;}
+            .hero-heading {font-size:clamp(36px,10vw,54px);}
+            .hero-description {font-size:12px;margin-inline:auto;}
+            .hero-actions,.hero-meta {justify-content:center;}
+            .hero-visual {min-height:330px;margin-top:5px;}
+            .hero-glass-card {transform:rotateY(-7deg) rotateX(4deg);}
+            .chip-top {right:3%;}.chip-bottom {left:2%;}
+        }
+        @media (max-width:480px) {
+            .hero-shell {border-radius:25px;padding:25px 17px 18px;}
+            .hero-visual {min-height:300px;}
+            .hero-glass-card {height:310px;width:250px;}
+            .hero-crest {width:125px;height:125px;margin-top:25px;}
+            .hero-crest span {font-size:72px;}
+            .hero-card-name {font-size:16px;}
+            .hero-float-chip {font-size:9px;padding:8px 10px;}
+            .floating-command-dock {bottom:8px;padding:5px 7px;gap:4px;max-width:98vw;}
+            .floating-command-dock button,.floating-command-dock a {font-size:9px !important;padding:7px 9px !important;}
+        }
+        @media (prefers-reduced-motion:reduce) {
+            *,*::before,*::after {animation-duration:.01ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important;transition-duration:.01ms !important;}
+        }
+    </style>
+</head>
+<body class="min-h-screen relative">
+
+    <canvas id="particle-canvas"></canvas>
+    <div id="cursor-glow"></div>
+
+    <div id="cinematic-intro" aria-label="مقدمة الموقع">
+        <div class="intro-orbit intro-orbit-one"></div>
+        <div class="intro-orbit intro-orbit-two"></div>
+        <div class="intro-grid"></div>
+        <div class="intro-emblem"><span>ص</span></div>
+        <div class="intro-copy text-center px-5">
+            <p class="intro-kicker">منذ عام 1966 · بغداد</p>
+            <h1 class="title-font intro-title">إعدادية صلاح الدين للبنين</h1>
+            <p class="intro-subtitle">منصة المدرسة الرقمية · الفرع العلمي</p>
+            <div class="intro-progress"><span></span></div>
+            <p class="intro-enter">نحو المعرفة والمستقبل</p>
+        </div>
+        <div class="intro-bottom">SALAH AL-DIN BOYS PREPARATORY SCHOOL</div>
+    </div>
+
+    <!-- شريط ترحيبي متحرك علوي -->
+    <div class="bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 text-black py-2 font-bold text-xs shadow-md relative z-10">
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <span>🌟 أهلاً بكم في المنصة السحابية الرسمية لإعدادية صلاح الدين للبنين (تأسست 1966) • إدارة أ. محمد أكرم الربيعي 🌟 رابط قناة السادس: t.me/salaldeen27 • قناة الخامس: t.me/salahschool27 • قناة الرابع: t.me/salah_2027_4 🌟</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- الهيدر العلوي -->
+    <header class="max-w-7xl mx-auto px-4 md:px-6 pt-6 pb-4 flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl theme-panel border border-yellow-500/40 flex items-center justify-center shadow-lg animate-bounce">
+                <span class="title-font text-2xl font-black gold-gradient-text">س</span>
+            </div>
+            <div>
+                <h1 class="title-font text-xl md:text-2xl font-extrabold gold-gradient-text tracking-wider">Salah Aldin</h1>
+                <p class="text-[10px] opacity-75 tracking-widest font-semibold uppercase">تأسست عام 1966 • إدارة أ. محمد أكرم الربيعي</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap justify-center">
+            <a href="https://t.me/schoolorders22" target="_blank" class="px-3 py-1.5 rounded-full theme-card text-[11px] font-bold flex items-center gap-1.5 border border-blue-500/30 text-blue-400 hover:scale-105 transition"><span>📢</span> العامة</a>
+            <a href="https://t.me/salaldeen27" target="_blank" class="px-3 py-1.5 rounded-full theme-card text-[11px] font-bold flex items-center gap-1.5 border border-yellow-500/40 text-yellow-400 hover:scale-105 transition"><span>✨</span> السادس</a>
+            <a href="https://t.me/salahschool27" target="_blank" class="px-3 py-1.5 rounded-full theme-card text-[11px] font-bold flex items-center gap-1.5 border border-purple-500/30 text-purple-400 hover:scale-105 transition"><span>📚</span> الخامس</a>
+            <a href="https://t.me/salah_2027_4" target="_blank" class="px-3 py-1.5 rounded-full theme-card text-[11px] font-bold flex items-center gap-1.5 border border-emerald-500/30 text-emerald-400 hover:scale-105 transition"><span>📖</span> الرابع</a>
+        </div>
+    </header>
+
+    <!-- واجهة الترحيب الرئيسية ثلاثية الأبعاد -->
+    <section class="hero-stage max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+        <div class="hero-shell">
+            <div class="hero-content">
+                <div class="hero-badge"><span class="hero-live-dot"></span> المنصة الرقمية الرسمية · 2026 / 2027</div>
+                <p class="hero-overline">أهلاً بكم في رحاب العلم</p>
+                <h2 class="title-font hero-heading">إعدادية صلاح الدين<br><span>للبنين</span></h2>
+                <p class="hero-description">مساحة رقمية تجمع أخبار المدرسة، الإرشادات، المختبرات العلمية، والخدمات الطلابية في مكان واحد.</p>
+                <div class="hero-actions">
+                    <button onclick="scrollToNotices()" class="hero-primary">استكشف التبليغات <span>←</span></button>
+                </div>
+                <div class="hero-meta"><span>✦ تأسست عام 1966</span><i></i><span>بغداد · الشعب</span><i></i><span>الفرع العلمي</span></div>
+            </div>
+            <div class="hero-visual" aria-hidden="true">
+                <div class="hero-ring ring-one"></div><div class="hero-ring ring-two"></div>
+                <div class="hero-glass-card">
+                    <div class="hero-card-top"><span class="hero-mini-mark">ص</span><span>EST. 1966</span></div>
+                    <div class="hero-crest"><span>ص</span></div>
+                    <div class="hero-card-name">SALAH AL-DIN</div>
+                    <div class="hero-card-sub">BOYS PREPARATORY SCHOOL</div>
+                    <div class="hero-card-line"></div>
+                    <div class="hero-card-footer"><span>بغداد</span><span>العلم · الانضباط · المستقبل</span></div>
+                </div>
+                <div class="hero-float-chip chip-top">✦ تعليم مستمر</div>
+                <div class="hero-float-chip chip-bottom">⌁ منصة سحابية</div>
+            </div>
+        </div>
+        <div class="hero-scroll-hint"><span></span> مرّر لاكتشاف أقسام المنصة</div>
+    </section>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 space-y-8 relative z-10 mb-28">
+
+        <!-- الأقسام الأربعة الجديدة والمخصصة للمختبرات (حاسوب، فيزياء، كيمياء، أحياء) -->
+        <section class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="title-font text-3xl font-black gold-gradient-text">المختبرات العلمية والتطبيقية</h2>
+                <p class="text-xs opacity-75">أقسام مختبرات الحاسوب، الفيزياء، الكيمياء، والأحياء (تحديثات فورية من الإدارة)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 1. مختبر الحاسوب -->
+                <div class="theme-panel p-6 rounded-[2rem] space-y-4 border-r-4 border-blue-500">
+                    <div class="flex justify-between items-center border-b border-yellow-500/20 pb-3">
+                        <h3 class="title-font text-lg font-black text-blue-400">💻 قسم مختبر الحاسوب</h3>
+                        <span class="text-[10px] opacity-75">سحابي مباشر</span>
+                    </div>
+                    <div id="lab-computer-container" class="space-y-4"></div>
+                </div>
+
+                <!-- 2. مختبر الفيزياء -->
+                <div class="theme-panel p-6 rounded-[2rem] space-y-4 border-r-4 border-yellow-500">
+                    <div class="flex justify-between items-center border-b border-yellow-500/20 pb-3">
+                        <h3 class="title-font text-lg font-black text-yellow-400">⚡ قسم مختبر الفيزياء</h3>
+                        <span class="text-[10px] opacity-75">سحابي مباشر</span>
+                    </div>
+                    <div id="lab-physics-container" class="space-y-4"></div>
+                </div>
+
+                <!-- 3. مختبر الكيمياء -->
+                <div class="theme-panel p-6 rounded-[2rem] space-y-4 border-r-4 border-emerald-500">
+                    <div class="flex justify-between items-center border-b border-yellow-500/20 pb-3">
+                        <h3 class="title-font text-lg font-black text-emerald-400">🧪 قسم مختبر الكيمياء</h3>
+                        <span class="text-[10px] opacity-75">سحابي مباشر</span>
+                    </div>
+                    <div id="lab-chemistry-container" class="space-y-4"></div>
+                </div>
+
+                <!-- 4. مختبر الأحياء -->
+                <div class="theme-panel p-6 rounded-[2rem] space-y-4 border-r-4 border-purple-500">
+                    <div class="flex justify-between items-center border-b border-yellow-500/20 pb-3">
+                        <h3 class="title-font text-lg font-black text-purple-400">🧬 قسم مختبر الأحياء</h3>
+                        <span class="text-[10px] opacity-75">سحابي مباشر</span>
+                    </div>
+                    <div id="lab-biology-container" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم التبليغات والإرشادات (أرشيف سحابي) -->
+        <section id="notices-section" class="theme-panel p-6 md:p-10 rounded-[2rem] space-y-6">
+            <div class="flex justify-between items-center border-b border-yellow-500/20 pb-4">
+                <div>
+                    <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 inline-block mb-2">
+                        التبليغات والإرشادات الرسمية (مدى الحياة)
+                    </span>
+                    <h2 class="title-font text-2xl md:text-3xl font-black">رادار الإدارة والإرشاد التربوي</h2>
+                </div>
+            </div>
+            <div id="live-posts-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- الخزينة السحابية للكتب -->
+        <section class="theme-panel p-6 md:p-8 rounded-[2rem] space-y-6">
+            <h3 class="title-font text-xl font-extrabold flex items-center gap-3">
+                <span>☁️</span> الخزينة السحابية للكتب والملازم الرسمية (أرشيف دائم)
+            </h3>
+            <div id="cloud-files-list" class="space-y-3"></div>
+        </section>
+
+        <!-- أساتذة المدرسة -->
+        <section class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="title-font text-3xl font-black gold-gradient-text">الأساتذة الأفاضل</h2>
+                <p class="text-xs opacity-75">مدرسين إعدادية صلاح الدين للبنين</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- الرابع العلمي -->
+                <div class="theme-panel p-6 rounded-3xl space-y-4">
+                    <h3 class="title-font text-lg font-bold text-yellow-400 border-b border-current pb-2">مدرسين الصف الرابع العلمي</h3>
+                    <ul class="space-y-2.5 text-xs">
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الحاسوب</span><strong class="font-bold">كوثر</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة العربي</span><strong class="font-bold">محمد</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الرياضيات</span><strong class="font-bold">اثير</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الاحياء</span><strong class="font-bold">محمد</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الكيمياء</span><strong class="font-bold">يوسف</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الانكليزي</span><strong class="font-bold">جعفر</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الاسلامية</span><strong class="font-bold">رافد</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الجرائم</span><strong class="font-bold">أسيل</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الفيزياء</span><strong class="font-bold">طه</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الكردي</span><strong class="font-bold">ضياء</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الفنيه</span><strong class="font-bold">وسيم</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>الرياضه والمسابقات</span><strong class="font-bold">سؤدد</strong></li>
+                    </ul>
+                </div>
+
+                <!-- الخامس العلمي -->
+                <div class="theme-panel p-6 rounded-3xl space-y-4">
+                    <h3 class="title-font text-lg font-bold text-yellow-400 border-b border-current pb-2">مدرسين الصف الخامس العلمي</h3>
+                    <ul class="space-y-2.5 text-xs">
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الحاسوب</span><strong class="font-bold">الاستاذ نورس</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة العربي</span><strong class="font-bold">فاضل</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الرياضيات</span><strong class="font-bold">أكرم + حسين</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الاسلاميه</span><strong class="font-bold">سيف</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الكيمياء</span><strong class="font-bold">علي</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الكردي</span><strong class="font-bold">ضياء</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الفيزياء</span><strong class="font-bold">محمد</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الاحياء</span><strong class="font-bold">رحيم</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الانكليزي</span><strong class="font-bold">تيسير</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الفنية</span><strong class="font-bold">وسيم</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>الرياضه والمسابقات</span><strong class="font-bold">سؤدد</strong></li>
+                    </ul>
+                </div>
+
+                <!-- السادس العلمي -->
+                <div class="theme-panel p-6 rounded-3xl space-y-4">
+                    <h3 class="title-font text-lg font-bold text-yellow-400 border-b border-current pb-2">مدرسين الصف السادس العلمي</h3>
+                    <ul class="space-y-2.5 text-xs">
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة العربي</span><strong class="font-bold">سند</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الانكليزي</span><strong class="font-bold">حيدر</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الرياضيات</span><strong class="font-bold">محمد</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الاحياء</span><strong class="font-bold">أياد</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الفنيه</span><strong class="font-bold">وسيم</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الاسلاميه</span><strong class="font-bold">مهند</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الفيزياء</span><strong class="font-bold">علي</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الكيمياء</span><strong class="font-bold">سمير</strong></li>
+                        <li class="flex justify-between p-2 rounded-xl theme-card"><span>مادة الرياضه والمسابقات</span><strong class="font-bold">أيهاب</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- معلومات التواصل والاعتماد -->
+        <section class="theme-panel p-6 rounded-2xl text-center space-y-2 relative">
+            <p class="text-xs opacity-75">للتواصل الرسمي مع المدرسة: <a href="mailto:salahaldinsc600l@gmail.com" class="text-yellow-400 underline">salahaldinsc600l@gmail.com</a></p>
+            <p class="text-[10px] opacity-60">جميع الحقوق محفوظة © أعدادية صلاح الدين للبنين (تأسست 1966)</p>
+            <div class="pt-2 text-[9px] opacity-40 tracking-wider">
+                تم إنشاء الموقع من أحد أبناء أعدادية صلاح الدين الطالب <span class="font-semibold">"علي مصطفى عبدالله"</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- شريط التحكم العائم المصغر والأنيق -->
+    <nav class="floating-command-dock flex items-center gap-1.5 md:gap-2 flex-wrap justify-center">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-2.5 py-1.5 rounded-full bg-yellow-500 text-black font-black text-[11px] shadow-md flex items-center gap-1">
+            <span>🏛️</span> الرئيسية
+        </button>
+        <button onclick="scrollToNotices()" class="px-2.5 py-1.5 rounded-full theme-card font-bold text-[11px] flex items-center gap-1 border border-yellow-500/20">
+            <span>📢</span> التبليغات
+        </button>
+        <a href="https://t.me/salaldeen27" target="_blank" class="px-2.5 py-1.5 rounded-full theme-card font-bold text-[11px] flex items-center gap-1 border border-yellow-500/30 text-yellow-400">
+            <span>✨</span> السادس
+        </a>
+        <a href="https://t.me/salahschool27" target="_blank" class="px-2.5 py-1.5 rounded-full theme-card font-bold text-[11px] flex items-center gap-1 border border-purple-500/30 text-purple-400">
+            <span>📚</span> الخامس
+        </a>
+        <a href="https://t.me/salah_2027_4" target="_blank" class="px-2.5 py-1.5 rounded-full theme-card font-bold text-[11px] flex items-center gap-1 border border-emerald-500/30 text-emerald-400">
+            <span>📖</span> الرابع
+        </a>
+        <button onclick="openPinModal()" class="px-2.5 py-1.5 rounded-full theme-card font-bold text-[11px] flex items-center gap-1 border border-yellow-500/30">
+            <span>🔐</span> الإدارة
+        </button>
+        <button onclick="openStudentsPinModal()" class="px-2.5 py-1.5 rounded-full theme-card font-bold text-[11px] flex items-center gap-1 border border-yellow-500/30 text-yellow-400">
+            <span>👨‍🎓</span> سجل الطلاب
+        </button>
+    </nav>
+
+    <!-- نافذة الرمز السري للإدارة -->
+    <div id="pin-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
+        <div class="theme-panel p-8 rounded-3xl max-w-md w-full space-y-6 border border-yellow-500/40 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="title-font text-xl font-black">تسجيل الدخول الإداري</h3>
+                <button onclick="closePinModal()" class="font-bold">✕</button>
+            </div>
+            <p class="text-xs opacity-80">أدخل الرمز السري المخصص لإدارة المدرسة:</p>
+            <input type="password" id="secret-pin-input" placeholder="••••" class="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-3 text-center tracking-widest text-lg outline-none focus:border-yellow-500">
+            <button onclick="verifySecretPin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-black text-sm shadow-lg">دخول اللوحة</button>
+        </div>
+    </div>
+
+    <!-- نافذة الرمز السري لسجل الطلاب -->
+    <div id="students-pin-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[1000] hidden flex items-center justify-center p-4">
+        <div class="theme-panel p-8 rounded-3xl max-w-md w-full space-y-6 border border-yellow-500/40 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="title-font text-xl font-black text-yellow-400">تسجيل دخول سجل الطلاب (المدير)</h3>
+                <button onclick="closeStudentsPinModal()" class="font-bold">✕</button>
+            </div>
+            <p class="text-xs opacity-80">أدخل الرمز السري الإداري للوصول إلى السير الذاتية وأرقام أولياء الأمور:</p>
+            <input type="password" id="students-pin-input" placeholder="••••" class="w-full bg-black/60 border border-white/20 rounded-xl px-4 py-3 text-center tracking-widest text-lg outline-none focus:border-yellow-500">
+            <button onclick="verifyStudentsPin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-black text-sm shadow-lg">دخول سجل الطلاب</button>
+        </div>
+    </div>
+
+    <!-- لوحة سجلات الطلاب (محمية وحصرية للمدير) -->
+    <div id="students-dashboard-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1000] hidden overflow-y-auto p-4 md:p-10">
+        <div class="max-w-5xl mx-auto theme-panel p-6 md:p-8 rounded-3xl space-y-6 border border-yellow-500/50">
+            <div class="flex justify-between items-center border-b border-current pb-4">
+                <div>
+                    <h2 class="title-font text-2xl font-black gold-gradient-text">سجل الإشراف الإداري للطلاب والسير الذاتية</h2>
+                    <p class="text-xs opacity-75">بيانات خاصة ومحمية سحابياً - تحت تحكم المدير حصراً</p>
+                </div>
+                <button onclick="closeStudentsDashboard()" class="px-4 py-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold">إغلاق السجل</button>
+            </div>
+
+            <!-- أداة إضافة طالب جديد -->
+            <div class="theme-card p-4 rounded-2xl space-y-3">
+                <h3 class="text-xs font-bold text-yellow-400">إضافة طالب جديد للسجل السحابي</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <input type="text" id="new-student-name" placeholder="اسم الطالب الثلاثي" class="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none">
+                    <select id="new-student-grade" class="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none">
+                        <option value="الرابع العلمي">الرابع العلمي</option>
+                        <option value="الخامس العلمي">الخامس العلمي</option>
+                        <option value="السادس العلمي">السادس العلمي</option>
+                    </select>
+                    <select id="new-student-section" class="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none">
+                        <option value="أ">الشعبة أ</option><option value="ب">الشعبة ب</option><option value="ج">الشعبة ج</option>
+                        <option value="د">الشعبة د</option><option value="هـ">الشعبة هـ</option><option value="و">الشعبة و</option>
+                    </select>
+                    <input type="text" id="new-student-phone" placeholder="رقم ولي الأمر" class="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs outline-none">
+                </div>
+                <textarea id="new-student-behavior" placeholder="السلوك المدرسي والملاحظات الانضباطية..." class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs h-16 outline-none resize-none"></textarea>
+                <button onclick="addNewStudent()" class="w-full py-2 rounded-xl bg-yellow-500 text-black font-bold text-xs shadow-md">إضافة الطالب وحفظه سحابياً</button>
+                <div class="border-t border-white/10 pt-3 space-y-2">
+                    <h3 class="text-xs font-bold text-emerald-400">استيراد قوائم الطلاب دفعة واحدة</h3>
+                    <p class="text-[10px] opacity-70">الصق القائمة مع عنوان كل شعبة (مثال: الرابع العلمي أ)، ثم الأسماء تحته، كل اسم بسطر. الأسماء المتطابقة تماماً تُحفظ مرة واحدة فقط.</p>
+                    <textarea id="students-bulk-import" placeholder="الرابع العلمي أ
+اسم الطالب الأول
+اسم الطالب الثاني
+الرابع العلمي ب
+اسم الطالب..." class="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-xs min-h-[150px] outline-none"></textarea>
+                    <button onclick="importStudentsBulk()" class="w-full py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs">استيراد وحفظ السجل سحابياً</button>
+                </div>
+            </div>
+
+            <!-- أدوات الفلترة والبحث -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="student-search-input" oninput="renderStudentsList()" placeholder="بحث عن اسم طالب..." class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none">
+                <select id="student-grade-filter" onchange="renderStudentsList()" class="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none">
+                    <option value="all">جميع الصفوف</option>
+                    <option value="الرابع العلمي">الرابع العلمي</option>
+                    <option value="الخامس العلمي">الخامس العلمي</option>
+                    <option value="السادس العلمي">السادس العلمي</option>
+                </select>
+                <select id="student-section-filter" onchange="renderStudentsList()" class="bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none">
+                    <option value="all">جميع الشعب</option>
+                    <option value="أ">الشعبة أ</option><option value="ب">الشعبة ب</option><option value="ج">الشعبة ج</option>
+                    <option value="د">الشعبة د</option><option value="هـ">الشعبة هـ</option><option value="و">الشعبة و</option>
+                </select>
+            </div>
+
+            <!-- قائمة الطلاب وسيرهم الذاتية -->
+            <div id="students-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="text-xs opacity-60 text-center py-4 col-span-2">جاري تحميل سجلات الطلاب...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم الإدارية العامة -->
+    <div id="admin-dashboard-modal" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-[1000] hidden overflow-y-auto p-4 md:p-10">
+        <div class="max-w-4xl mx-auto theme-panel p-6 md:p-8 rounded-3xl space-y-8 border border-yellow-500/50">
+            <div class="flex justify-between items-center border-b border-current pb-4">
+                <h2 class="title-font text-2xl font-black gold-gradient-text">لوحة التحكم السحابية الرسمية (أعدادية صلاح الدين)</h2>
+                <button onclick="closeAdminDashboard()" class="px-4 py-2 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold">إغلاق اللوحة</button>
+            </div>
+
+            <!-- أداة إضافية لتعديل النصوص الثابتة في جميع أقسام الموقع -->
+            <div class="theme-card p-4 rounded-2xl space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <p class="text-xs font-bold text-yellow-400">تعديل نصوص الموقع بالكامل</p>
+                        <p class="text-[10px] opacity-65">فعّل الأداة ثم اضغط على أي نص في الموقع لتعديله وحفظه سحابياً.</p>
+                    </div>
+                    <button id="site-text-edit-toggle" onclick="toggleSiteTextEditing()" class="px-4 py-2 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 text-xs font-bold">تفعيل تعديل النصوص ✏️</button>
+                </div>
+            </div>
+
+            <!-- 1. نشر التبليغات العامة -->
+            <div class="space-y-4">
+                <h3 class="font-bold text-sm">1. إدارة ونشر التبليغات والإرشادات العامة</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="theme-card p-4 rounded-2xl space-y-3">
+                        <label class="text-xs font-bold text-yellow-400">قسم الإدارة (أ. محمد أكرم الربيعي)</label>
+                        <textarea id="admin-post-text" placeholder="اكتب تبليغ الإدارة هنا..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs h-24 outline-none resize-none"></textarea>
+                        <input type="file" id="admin-image-file" accept="image/*" class="text-xs opacity-70">
+                        <button onclick="publishAdminPost()" class="w-full py-2 rounded-lg bg-yellow-500 text-black font-bold text-xs shadow-md">نشر فوري للإدارة</button>
+                    </div>
+
+                    <div class="theme-card p-4 rounded-2xl space-y-3">
+                        <label class="text-xs font-bold text-emerald-400">قسم الإرشاد (أحمد زبون الساعدي)</label>
+                        <textarea id="guidance-post-text" placeholder="اكتب إرشاد التوعية هنا..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs h-24 outline-none resize-none"></textarea>
+                        <input type="file" id="guidance-image-file" accept="image/*" class="text-xs opacity-70">
+                        <button onclick="publishGuidancePost()" class="w-full py-2 rounded-lg bg-emerald-500 text-black font-bold text-xs shadow-md">نشر فوري للإرشاد</button>
+                    </div>
+                </div>
+
+                <div class="theme-card p-4 rounded-2xl space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <label class="text-xs font-bold text-red-500">إدارة التبليغات المنشورة</label>
+                        <span class="text-[10px] opacity-60">الحذف متاح للمدير فقط</span>
+                    </div>
+                    <div id="admin-posts-management-list" class="space-y-2">
+                        <p class="text-xs opacity-60 text-center py-2">جاري تحميل التبليغات...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. النشر في المختبرات الأربعة -->
+            <div class="space-y-4 border-t border-current pt-6">
+                <h3 class="font-bold text-sm">2. النشر في الأقسام والمختبرات (حاسوب، فيزياء، كيمياء، أحياء)</h3>
+                <div class="theme-card p-4 rounded-2xl space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold block mb-1">اختر القسم أو المختبر:</label>
+                            <select id="lab-select" class="w-full bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs outline-none">
+                                <option value="computer">💻 مختبر الحاسوب</option>
+                                <option value="physics">⚡ مختبر الفيزياء</option>
+                                <option value="chemistry">🧪 مختبر الكيمياء</option>
+                                <option value="biology">🧬 مختبر الأحياء</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1">اختر ملف (صورة أو فيديو):</label>
+                            <input type="file" id="lab-media-file" accept="image/*,video/*" class="text-xs opacity-70 pt-1">
+                        </div>
+                    </div>
+                    <textarea id="lab-post-text" placeholder="اكتب محتوى أو تفاصيل النشر للمختبر..." class="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-xs h-20 outline-none resize-none"></textarea>
+                    <button onclick="publishLabPost()" class="w-full py-2.5 rounded-lg bg-purple-600 text-white font-bold text-xs shadow-md">نشر في المختبر المحدد</button>
+                </div>
+
+                <div class="theme-card p-4 rounded-2xl space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <label class="text-xs font-bold text-purple-400">إدارة منشورات الأقسام العلمية</label>
+                        <span class="text-[10px] opacity-60">تعديل وحذف للمدير فقط</span>
+                    </div>
+                    <div id="admin-labs-management-list" class="space-y-3">
+                        <p class="text-xs opacity-60 text-center py-2">جاري تحميل منشورات الأقسام...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. إدارة الكتب -->
+            <div class="space-y-4 border-t border-current pt-6">
+                <h3 class="font-bold text-sm">3. إدارة الكتب والملفات (رفع أو حذف من الخزينة)</h3>
+                <div class="theme-card p-4 rounded-2xl space-y-3">
+                    <input type="text" id="book-title" placeholder="عنوان الكتاب أو الملزمة" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none">
+                    <input type="text" id="book-link" placeholder="رابط التحميل أو الملف السحابي" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none">
+                    <button onclick="uploadCloudBook()" class="px-6 py-2 rounded-lg bg-purple-500 text-white font-bold text-xs shadow-md">رفع الكتاب للسحابة</button>
+                </div>
+            </div>
+
+            <!-- 4. تغيير الرمز السري -->
+            <div class="space-y-4 border-t border-current pt-6">
+                <h3 class="font-bold text-sm">4. تغيير الرمز السري للإدارة (سحابي وآمن)</h3>
+                <div class="theme-card p-4 rounded-2xl space-y-3">
+                    <input type="password" id="new-admin-pin" placeholder="أدخل الرمز السري الجديد" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none">
+                    <button onclick="updateAdminPin()" class="px-6 py-2 rounded-lg bg-emerald-600 text-white font-bold text-xs shadow-md">حفظ الرمز الجديد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- السكربتات البرمجية وأمان السحابة -->
+    <script>
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.7;
+                this.speedY = (Math.random() - 0.5) * 0.7;
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let count = Math.floor((window.innerWidth * window.innerHeight) / 14000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        function scrollToNotices() {
+            document.getElementById('notices-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!document.getElementById('site-text-edit-helper')) {
+                const helper = document.createElement('div');
+                helper.id = 'site-text-edit-helper';
+                helper.className = 'hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[2000]';
+                helper.innerHTML = '<button type="button" onclick="stopSiteTextEditing()" class="px-5 py-3 rounded-full bg-emerald-600 text-white font-bold text-sm shadow-2xl">إنهاء التعديل والعودة للإشراف ✓</button>';
+                document.body.appendChild(helper);
+            }
+        });
+
+        const firebaseConfig = {
+            databaseURL: "https://salah-d8f8c-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let isAdminLoggedIn = false;
+        let siteTextEditingEnabled = false;
+        let savedSiteTextEdits = {};
+        const SITE_TEXT_STORAGE_KEY = 'salahaldin_site_text_edits_v2';
+
+        function getSiteTextKey(element) {
+            if (element.id) return 'id__' + element.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+            const parts = [];
+            let node = element;
+            while (node && node !== document.body) {
+                const parent = node.parentElement;
+                if (!parent) break;
+                const siblings = Array.from(parent.children).filter(child => child.tagName === node.tagName);
+                parts.unshift(node.tagName.toLowerCase() + '_' + (siblings.indexOf(node) + 1));
+                node = parent;
+            }
+            return parts.join('__').replace(/[.#$\[\]\/]/g, '_');
+        }
+
+        function readLocalSiteTextEdits() {
+            try {
+                const value = JSON.parse(localStorage.getItem(SITE_TEXT_STORAGE_KEY) || '{}');
+                return value && typeof value === 'object' ? value : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function writeLocalSiteTextEdits() {
+            try {
+                localStorage.setItem(SITE_TEXT_STORAGE_KEY, JSON.stringify(savedSiteTextEdits));
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function applySavedSiteTextEdits() {
+            document.querySelectorAll('body *').forEach(element => {
+                if (element.closest('#admin-dashboard-modal, #pin-modal, #students-dashboard-modal, #students-pin-modal, #site-text-edit-helper, script, style, textarea, input, select, button, nav, svg')) return;
+                if (element.children.length !== 0 || !element.textContent.trim()) return;
+                const key = getSiteTextKey(element);
+                if (Object.prototype.hasOwnProperty.call(savedSiteTextEdits, key)) {
+                    element.textContent = savedSiteTextEdits[key];
+                }
+            });
+        }
+
+        function toggleSiteTextEditing() {
+            if (!isAdminLoggedIn) { alert('هذه الصلاحية للمدير فقط.'); return; }
+            siteTextEditingEnabled = !siteTextEditingEnabled;
+            const button = document.getElementById('site-text-edit-toggle');
+            if (button) {
+                button.textContent = siteTextEditingEnabled ? 'إيقاف تعديل النصوص ✖' : 'تفعيل تعديل النصوص ✏️';
+                button.classList.toggle('bg-emerald-500/20', siteTextEditingEnabled);
+                button.classList.toggle('text-emerald-400', siteTextEditingEnabled);
+            }
+            document.body.style.cursor = siteTextEditingEnabled ? 'text' : '';
+            const helper = document.getElementById('site-text-edit-helper');
+            if (helper) helper.classList.toggle('hidden', !siteTextEditingEnabled);
+            if (siteTextEditingEnabled) {
+                document.getElementById('admin-dashboard-modal').classList.add('hidden');
+                alert('تم تفعيل التعديل. اضغط على النص المطلوب ثم اكتب النص الجديد.');
+            } else {
+                document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+            }
+        }
+
+        function stopSiteTextEditing() {
+            if (!isAdminLoggedIn) return;
+            siteTextEditingEnabled = false;
+            document.body.style.cursor = '';
+            const helper = document.getElementById('site-text-edit-helper');
+            if (helper) helper.classList.add('hidden');
+            const button = document.getElementById('site-text-edit-toggle');
+            if (button) {
+                button.textContent = 'تفعيل تعديل النصوص ✏️';
+                button.classList.remove('bg-emerald-500/20', 'text-emerald-400');
+            }
+            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!siteTextEditingEnabled || !isAdminLoggedIn) return;
+            let node = event.target;
+            while (node && node !== document.body) {
+                if (node.closest('#admin-dashboard-modal, #pin-modal, #students-dashboard-modal, #students-pin-modal, #site-text-edit-helper, script, style, textarea, input, select, button, nav, svg')) return;
+                if (node.children.length === 0 && node.textContent.trim()) break;
+                node = node.parentElement;
+            }
+            if (!node || !node.textContent.trim()) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const oldText = node.textContent.trim();
+            const newText = prompt('اكتب النص الجديد:', oldText);
+            if (newText === null || newText.trim() === '' || newText.trim() === oldText) return;
+            const key = getSiteTextKey(node);
+            const cleanText = newText.trim();
+
+            savedSiteTextEdits[key] = cleanText;
+            writeLocalSiteTextEdits();
+            node.textContent = cleanText;
+
+            db.ref('siteTextEdits/' + key).set(cleanText).then(() => {
+                alert('تم حفظ التعديل محلياً وسحابياً بنجاح.');
+            }).catch(error => {
+                alert('تم الحفظ محلياً وتتعذر المزامنة السحابية.');
+            });
+        }, true);
+
+        savedSiteTextEdits = readLocalSiteTextEdits();
+        document.addEventListener('DOMContentLoaded', applySavedSiteTextEdits);
+        db.ref('siteTextEdits').on('value', snapshot => {
+            const cloudEdits = snapshot.val() || {};
+            savedSiteTextEdits = Object.assign({}, cloudEdits, readLocalSiteTextEdits());
+            writeLocalSiteTextEdits();
+            applySavedSiteTextEdits();
+        });
+
+        const cursorGlow = document.getElementById('cursor-glow');
+        window.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('cinematic-intro').classList.add('fade-out');
+            }, 2600);
+        });
+
+        function openPinModal() {
+            document.getElementById('pin-modal').classList.remove('hidden');
+        }
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.add('hidden');
+            document.getElementById('secret-pin-input').value = '';
+        }
+
+        function verifySecretPin() {
+            let enteredPin = document.getElementById('secret-pin-input').value;
+            db.ref('settings/adminPin').once('value').then((snapshot) => {
+                let currentPin = snapshot.val() || "1966";
+                if (enteredPin === currentPin) {
+                    isAdminLoggedIn = true;
+                    closePinModal();
+                    document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+                    refreshViews();
+                } else {
+                    alert('الرمز السري غير صحيح!');
+                }
+            });
+        }
+
+        function updateAdminPin() {
+            let newPin = document.getElementById('new-admin-pin').value;
+            if(!newPin || newPin.length < 4) { alert('أدخل رمزاً سرياً مكوناً من 4 أرقام على الأقل'); return; }
+            db.ref('settings/adminPin').set(newPin, (error) => {
+                if(!error) {
+                    alert('تم تحديث الرمز السري للإدارة بنجاح في السحابة!');
+                    document.getElementById('new-admin-pin').value = '';
+                }
+            });
+        }
+
+        function closeAdminDashboard() {
+            siteTextEditingEnabled = false;
+            isAdminLoggedIn = false;
+            const editButton = document.getElementById('site-text-edit-toggle');
+            if (editButton) {
+                editButton.textContent = 'تفعيل تعديل النصوص ✏️';
+                editButton.classList.remove('bg-emerald-500/20', 'text-emerald-400');
+            }
+            document.body.style.cursor = '';
+            const helper = document.getElementById('site-text-edit-helper');
+            if (helper) helper.classList.add('hidden');
+            document.getElementById('admin-dashboard-modal').classList.add('hidden');
+            renderPosts();
+            ['computer', 'physics', 'chemistry', 'biology'].forEach(lab => renderLab(lab));
+            renderBooks();
+        }
+
+        function publishAdminPost() {
+            let text = document.getElementById('admin-post-text').value;
+            let fileInput = document.getElementById('admin-image-file');
+            if(!text && fileInput.files.length === 0) { alert('اكتب نصاً أو اختر صورة أولاً'); return; }
+
+            if(fileInput.files[0]) {
+                let reader = new FileReader();
+                reader.readAsDataURL(fileInput.files[0]);
+                reader.onload = function () {
+                    savePostToFirebase('قسم الإدارة (أ. محمد أكرم الربيعي)', text, reader.result, 'yellow');
+                }
+            } else {
+                savePostToFirebase('قسم الإدارة (أ. محمد أكرم الربيعي)', text, null, 'yellow');
+            }
+        }
+
+        function publishGuidancePost() {
+            let text = document.getElementById('guidance-post-text').value;
+            let fileInput = document.getElementById('guidance-image-file');
+            if(!text && fileInput.files.length === 0) { alert('اكتب نصاً أو اختر صورة أولاً'); return; }
+
+            if(fileInput.files[0]) {
+                let reader = new FileReader();
+                reader.readAsDataURL(fileInput.files[0]);
+                reader.onload = function () {
+                    savePostToFirebase('قسم الإرشاد التربوي (أحمد زبون الساعدي)', text, reader.result, 'emerald');
+                }
+            } else {
+                savePostToFirebase('قسم الإرشاد التربوي (أحمد زبون الساعدي)', text, null, 'emerald');
+            }
+        }
+
+        function savePostToFirebase(author, text, imgSrc, colorClass) {
+            db.ref('posts').push({
+                author: author,
+                text: text,
+                imgSrc: imgSrc,
+                colorClass: colorClass,
+                timestamp: Date.now()
+            }, (error) => {
+                if (!error) {
+                    alert('تم نشر التبليغ بنجاح وحفظه في الأرشيف الدائم!');
+                    document.getElementById('admin-post-text').value = '';
+                    document.getElementById('guidance-post-text').value = '';
+                }
+            });
+        }
+
+        function publishLabPost() {
+            let labType = document.getElementById('lab-select').value;
+            let text = document.getElementById('lab-post-text').value;
+            let fileInput = document.getElementById('lab-media-file');
+
+            if(!text && fileInput.files.length === 0) { alert('يرجى كتابة نص أو إرفاق ملف (صورة/فيديو)'); return; }
+
+            let labNames = {
+                'computer': 'مختبر الحاسوب',
+                'physics': 'مختبر الفيزياء',
+                'chemistry': 'مختبر الكيمياء',
+                'biology': 'مختبر الأحياء'
+            };
+
+            if(fileInput.files[0]) {
+                let reader = new FileReader();
+                let file = fileInput.files[0];
+                let isVideo = file.type.startsWith('video');
+                reader.readAsDataURL(file);
+                reader.onload = function () {
+                    saveLabPostToFirebase(labType, labNames[labType], text, reader.result, isVideo);
+                }
+            } else {
+                saveLabPostToFirebase(labType, labNames[labType], text, null, false);
+            }
+        }
+
+        function saveLabPostToFirebase(labType, labTitle, text, mediaSrc, isVideo) {
+            db.ref('labs/' + labType).push({
+                title: labTitle,
+                text: text,
+                mediaSrc: mediaSrc,
+                isVideo: isVideo,
+                timestamp: Date.now()
+            }, (error) => {
+                if(!error) {
+                    alert('تم النشر في القسم بنجاح وتحديثه سحابياً للطلاب!');
+                    document.getElementById('lab-post-text').value = '';
+                    document.getElementById('lab-media-file').value = '';
+                }
+            });
+        }
+
+        function deleteLabPost(labType, postId) {
+            if(!isAdminLoggedIn) { alert('عذراً، هذه الصلاحية للمدير فقط!'); return; }
+            if(confirm('هل أنت متأكد من حذف هذا المنشور من القسم؟')) {
+                db.ref(`labs/${labType}/${postId}`).remove().then(() => {
+                    alert('تم الحذف بنجاح!');
+                });
+            }
+        }
+
+        function editLabPost(labType, postId) {
+            if(!isAdminLoggedIn) { alert('عذراً، هذه الصلاحية للمدير فقط!'); return; }
+            const currentPost = (globalLabsData[labType] || {})[postId];
+            if(!currentPost) { alert('تعذر العثور على المنشور.'); return; }
+
+            const updatedText = prompt('عدّل نص المنشور:', currentPost.text || '');
+            if(updatedText === null) return;
+
+            db.ref(`labs/${labType}/${postId}`).update({
+                text: updatedText,
+                editedAt: Date.now()
+            }).then(() => {
+                alert('تم تعديل المنشور وتحديثه للطلاب بنجاح!');
+            });
+        }
+
+        function renderAdminLabs() {
+            const list = document.getElementById('admin-labs-management-list');
+            if(!list) return;
+
+            if(!isAdminLoggedIn) {
+                list.innerHTML = '<p class="text-xs opacity-60 text-center py-2">سجّل الدخول لعرض أدوات إدارة الأقسام.</p>';
+                return;
+            }
+
+            const labNames = {
+                computer: '💻 الحاسوب',
+                chemistry: '🧪 الكيمياء',
+                biology: '🧬 الأحياء',
+                physics: '⚡ الفيزياء'
+            };
+            list.innerHTML = '';
+
+            ['computer', 'chemistry', 'biology', 'physics'].forEach((labType) => {
+                const section = document.createElement('div');
+                section.className = 'space-y-2 border-b border-current/10 pb-3 last:border-0';
+                const heading = document.createElement('p');
+                heading.className = 'text-xs font-black text-yellow-400';
+                heading.textContent = labNames[labType];
+                section.appendChild(heading);
+
+                const posts = globalLabsData[labType] || {};
+                const keys = Object.keys(posts).reverse();
+                if(keys.length === 0) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-[11px] opacity-50';
+                    empty.textContent = 'لا توجد منشورات في هذا القسم.';
+                    section.appendChild(empty);
+                } else {
+                    keys.forEach((key) => {
+                        const post = posts[key] || {};
+                        const row = document.createElement('div');
+                        row.className = 'theme-card rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2';
+                        const details = document.createElement('div');
+                        details.className = 'min-w-0 flex-1';
+                        const message = document.createElement('p');
+                        message.className = 'text-xs break-words';
+                        message.textContent = post.text || (post.mediaSrc ? 'منشور مرفق بوسائط' : 'منشور بدون نص');
+                        details.append(message);
+
+                        const actions = document.createElement('div');
+                        actions.className = 'flex gap-2 shrink-0';
+                        const edit = document.createElement('button');
+                        edit.type = 'button';
+                        edit.className = 'px-3 py-2 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30 text-[11px] font-bold';
+                        edit.textContent = 'تعديل ✏️';
+                        edit.addEventListener('click', () => editLabPost(labType, key));
+
+                        const remove = document.createElement('button');
+                        remove.type = 'button';
+                        remove.className = 'px-3 py-2 rounded-lg bg-red-500/15 text-red-500 border border-red-500/30 text-[11px] font-bold';
+                        remove.textContent = 'حذف 🗑️';
+                        remove.addEventListener('click', () => deleteLabPost(labType, key));
+
+                        actions.append(edit, remove);
+                        row.append(details, actions);
+                        section.appendChild(row);
+                    });
+                }
+                list.appendChild(section);
+            });
+        }
+
+        function deletePost(postId) {
+            if(!isAdminLoggedIn) { alert('عذراً، هذه الصلاحية للمدير فقط!'); return; }
+            if(confirm('هل أنت متأكد من حذف هذا التبليغ نهائياً من السحابة؟')) {
+                db.ref('posts/' + postId).remove().then(() => {
+                    alert('تم حذف التبليغ بنجاح!');
+                });
+            }
+        }
+
+        function deleteBook(bookId) {
+            if(!isAdminLoggedIn) { alert('عذراً، هذه الصلاحية للمدير فقط!'); return; }
+            if(confirm('هل أنت متأكد من حذف هذا الكتاب من الخزينة السحابية؟')) {
+                db.ref('books/' + bookId).remove().then(() => {
+                    alert('تم حذف الكتاب بنجاح!');
+                });
+            }
+        }
+
+        let globalPostsData = null;
+        let globalBooksData = null;
+        let globalLabsData = {};
+
+        db.ref('posts').on('value', (snapshot) => {
+            globalPostsData = snapshot.val();
+            renderPosts();
+        });
+
+        db.ref('books').on('value', (snapshot) => {
+            globalBooksData = snapshot.val();
+            renderBooks();
+        });
+
+        ['computer', 'physics', 'chemistry', 'biology'].forEach(lab => {
+            db.ref('labs/' + lab).on('value', (snapshot) => {
+                globalLabsData[lab] = snapshot.val();
+                renderLab(lab);
+                renderAdminLabs();
+            });
+        });
+
+        function refreshViews() {
+            renderPosts();
+            renderBooks();
+            ['computer', 'physics', 'chemistry', 'biology'].forEach(lab => renderLab(lab));
+            renderAdminLabs();
+        }
+
+        function renderPosts() {
+            let container = document.getElementById('live-posts-container');
+            container.innerHTML = '';
+            if (globalPostsData) {
+                Object.keys(globalPostsData).reverse().forEach((key) => {
+                    let post = globalPostsData[key];
+                    let div = document.createElement('div');
+                    div.className = `theme-card p-6 rounded-2xl space-y-3 border-r-4 border-${post.colorClass}-500 relative`;
+                    
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center pr-2"><span class="text-xs font-bold text-${post.colorClass}-400">${post.author}</span><span class="text-[10px] opacity-75">أرشيف سحابي دائم</span></div>
+                        <h3 class="font-bold text-base pr-2">${post.text || ''}</h3>
+                        ${post.imgSrc ? `<img src="${post.imgSrc}" class="rounded-xl mt-3 max-h-60 w-full object-cover border border-current">` : ''}
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            renderAdminPosts();
+        }
+
+        function renderAdminPosts() {
+            const list = document.getElementById('admin-posts-management-list');
+            if (!list) return;
+
+            if (!isAdminLoggedIn) {
+                list.innerHTML = '<p class="text-xs opacity-60 text-center py-2">سجّل الدخول لعرض أدوات إدارة التبليغات.</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            if (!globalPostsData || Object.keys(globalPostsData).length === 0) {
+                list.innerHTML = '<p class="text-xs opacity-60 text-center py-2">لا توجد تبليغات منشورة حالياً.</p>';
+                return;
+            }
+
+            Object.keys(globalPostsData).reverse().forEach((key) => {
+                const post = globalPostsData[key] || {};
+                const row = document.createElement('div');
+                row.className = 'theme-card rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3';
+                const details = document.createElement('div');
+                details.className = 'min-w-0 flex-1';
+                const author = document.createElement('p');
+                author.className = 'text-[11px] font-bold text-yellow-400';
+                author.textContent = post.author || 'تبليغ إداري';
+                const message = document.createElement('p');
+                message.className = 'text-xs mt-1 break-words';
+                message.textContent = post.text || (post.imgSrc ? 'تبليغ مرفق بصورة' : 'تبليغ بدون نص');
+                details.append(author, message);
+
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'shrink-0 px-3 py-2 rounded-lg bg-red-500/15 text-red-500 border border-red-500/30 text-[11px] font-bold hover:bg-red-500 hover:text-white transition';
+                remove.textContent = 'حذف التبليغ 🗑️';
+                remove.addEventListener('click', () => deletePost(key));
+
+                row.append(details, remove);
+                list.appendChild(row);
+            });
+        }
+
+        function renderLab(labType) {
+            let containerMap = {
+                'computer': 'lab-computer-container',
+                'physics': 'lab-physics-container',
+                'chemistry': 'lab-chemistry-container',
+                'biology': 'lab-biology-container'
+            };
+            let container = document.getElementById(containerMap[labType]);
+            if(!container) return;
+            container.innerHTML = '';
+
+            let data = globalLabsData[labType];
+            if (data) {
+                Object.keys(data).reverse().forEach((key) => {
+                    let item = data[key];
+                    let div = document.createElement('div');
+                    div.className = 'theme-card p-4 rounded-xl space-y-2 relative';
+
+                    let deleteBtn = isAdminLoggedIn ? `<button onclick="deleteLabPost('${labType}', '${key}')" class="absolute top-3 left-3 px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30 text-[9px] font-bold">حذف 🗑️</button>` : '';
+
+                    let mediaHtml = '';
+                    if (item.mediaSrc) {
+                        if (item.isVideo) {
+                            mediaHtml = `<video controls class="rounded-xl mt-2 max-h-48 w-full object-cover border border-current"><source src="${item.mediaSrc}" type="video/mp4"></video>`;
+                        } else {
+                            mediaHtml = `<img src="${item.mediaSrc}" class="rounded-xl mt-2 max-h-48 w-full object-cover border border-current">`;
+                        }
+                    }
+
+                    div.innerHTML = `
+                        <p class="text-xs leading-relaxed font-semibold pr-2">${item.text || ''}</p>
+                        ${mediaHtml}
+                        ${deleteBtn}
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = '<p class="text-[11px] opacity-50 text-center py-2">لا توجد منشورات حالية في هذا المختبر.</p>';
+            }
+        }
+
+        function uploadCloudBook() {
+            let title = document.getElementById('book-title').value;
+            let link = document.getElementById('book-link').value || '#';
+            if(!title) { alert('أدخل عنوان الكتاب'); return; }
+
+            db.ref('books').push({
+                title: title,
+                link: link,
+                timestamp: Date.now()
+            }, (error) => {
+                if(!error) {
+                    alert('تم رفع الكتاب إلى الخزينة السحابية بنجاح!');
+                    document.getElementById('book-title').value = '';
+                    document.getElementById('book-link').value = '';
+                }
+            });
+        }
+
+        function renderBooks() {
+            let list = document.getElementById('cloud-files-list');
+            list.innerHTML = '';
+            if (globalBooksData) {
+                Object.keys(globalBooksData).reverse().forEach((key) => {
+                    let book = globalBooksData[key];
+                    let item = document.createElement('div');
+                    item.className = 'theme-card p-4 rounded-xl flex items-center justify-between';
+                    
+                    let deleteBookBtn = isAdminLoggedIn ? `<button onclick="deleteBook('${key}')" class="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold hover:bg-red-500 hover:text-white transition">حذف الكتاب 🗑️</button>` : '';
+
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs">PDF</div>
+                            <div><h4 class="font-bold text-sm">${book.title}</h4><p class="text-[11px] opacity-75">سحابة أعدادية صلاح الدين الدائمة</p></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <a href="${book.link}" target="_blank" class="px-4 py-2 rounded-lg theme-card text-xs font-semibold text-yellow-400 border border-yellow-500/30">تحميل مباشر</a>
+                            ${deleteBookBtn}
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        // --- إدارة سجلات الطلاب والسير الذاتية (للمدير فقط) ---
+        let globalStudentsData = {};
+
+        function openStudentsPinModal() {
+            document.getElementById('students-pin-modal').classList.remove('hidden');
+        }
+
+        function closeStudentsPinModal() {
+            document.getElementById('students-pin-modal').classList.add('hidden');
+            document.getElementById('students-pin-input').value = '';
+        }
+
+        function verifyStudentsPin() {
+            let enteredPin = document.getElementById('students-pin-input').value;
+            db.ref('settings/adminPin').once('value').then((snapshot) => {
+                let currentPin = snapshot.val() || "1966";
+                if (enteredPin === currentPin) {
+                    isAdminLoggedIn = true;
+                    closeStudentsPinModal();
+                    document.getElementById('students-dashboard-modal').classList.remove('hidden');
+                    listenStudentsData();
+                } else {
+                    alert('الرمز السري غير صحيح!');
+                }
+            });
+        }
+
+        function closeStudentsDashboard() {
+            document.getElementById('students-dashboard-modal').classList.add('hidden');
+        }
+
+        function listenStudentsData() {
+            db.ref('students').on('value', (snapshot) => {
+                globalStudentsData = snapshot.val() || {};
+                renderStudentsList();
+            });
+        }
+
+        function addNewStudent() {
+            let name = document.getElementById('new-student-name').value.trim();
+            let grade = document.getElementById('new-student-grade').value;
+            let section = document.getElementById('new-student-section').value;
+            let phone = document.getElementById('new-student-phone').value.trim();
+            let behavior = document.getElementById('new-student-behavior').value.trim();
+
+            if (!name) { alert('يرجى إدخال اسم الطالب'); return; }
+            const normalizedName = normalizeStudentName(name);
+            if (Object.values(globalStudentsData).some(s => normalizeStudentName(s.name || '') === normalizedName)) { alert('هذا الاسم موجود مسبقاً في السجل، لم تتم إضافته مرة ثانية.'); return; }
+
+            db.ref('students').push({
+                name: name,
+                grade: grade,
+                section: section,
+                guardianPhone: phone || 'غير محدد',
+                behaviorNotes: behavior || 'جيد جداً',
+                timestamp: Date.now()
+            }, (error) => {
+                if (!error) {
+                    alert('تمت إضافة الطالب لسجل الإشراف بنجاح!');
+                    document.getElementById('new-student-name').value = '';
+                    document.getElementById('new-student-phone').value = '';
+                    document.getElementById('new-student-behavior').value = '';
+                }
+            });
+        }
+
+        function escapeStudentHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch])); }
+
+        function normalizeStudentName(value) {
+            return String(value || '').replace(/[\u0640\s]+/g, ' ').trim();
+        }
+
+        function importStudentsBulk() {
+            const raw = document.getElementById('students-bulk-import').value;
+            if (!raw.trim()) { alert('الصق قائمة الأسماء أولاً.'); return; }
+            const gradeNames = ['الرابع العلمي', 'الخامس العلمي', 'السادس العلمي'];
+            const sections = ['أ', 'ب', 'ج', 'د', 'هـ', 'و'];
+            let currentGrade = '', currentSection = '';
+            const existing = new Set(Object.values(globalStudentsData).map(s => normalizeStudentName(s.name)).filter(Boolean));
+            const additions = {};
+            let skipped = 0, invalid = 0;
+            raw.split(/\r?\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
+                const heading = line.replace(/[()\[\]ـ:：]/g, ' ').replace(/\s+/g, ' ').trim();
+                const grade = gradeNames.find(g => heading.includes(g));
+                const section = sections.find(sec => new RegExp('(?:^|\\s)' + sec + '(?:$|\\s)').test(heading.replace(grade || '', '').trim()));
+                if (grade && section) { currentGrade = grade; currentSection = section; return; }
+                if (!currentGrade || !currentSection) { invalid++; return; }
+                const name = line.replace(/^[-•٠-٩0-9.\s]+/, '').trim();
+                if (!name) return;
+                const normalized = normalizeStudentName(name);
+                if (existing.has(normalized)) { skipped++; return; }
+                existing.add(normalized);
+                const key = db.ref('students').push().key;
+                additions[key] = { name, grade: currentGrade, section: currentSection, guardianPhone: 'غير محدد', behaviorNotes: 'جيد جداً', timestamp: Date.now() };
+            });
+            const count = Object.keys(additions).length;
+            if (!count) { alert('لم يتم العثور على أسماء جديدة قابلة للاستيراد. تأكد من كتابة عنوان كل شعبة بهذا الشكل: الرابع العلمي أ'); return; }
+            db.ref('students').update(additions).then(() => {
+                document.getElementById('students-bulk-import').value = '';
+                alert('اكتمل الاستيراد بنجاح. تمت إضافة ' + count + ' طالباً، وتجاوز ' + skipped + ' اسماً مكرراً.' + (invalid ? ' وتجاهل ' + invalid + ' سطراً خارج تنسيق الشعب.' : ''));
+            }).catch(err => alert('تعذر الحفظ السحابي: ' + err.message));
+        }
+
+        function renderStudentsList() {
+            const container = document.getElementById('students-cards-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const searchQuery = (document.getElementById('student-search-input').value || '').trim().toLowerCase();
+            const selectedGrade = document.getElementById('student-grade-filter').value;
+            const selectedSection = document.getElementById('student-section-filter').value;
+
+            const keys = Object.keys(globalStudentsData).reverse();
+            let filteredKeys = keys.filter(key => {
+                const s = globalStudentsData[key];
+                const matchName = s.name && s.name.toLowerCase().includes(searchQuery);
+                const matchGrade = (selectedGrade === 'all') || (s.grade === selectedGrade);
+                const matchSection = (selectedSection === 'all') || ((s.section || '') === selectedSection);
+                return matchName && matchGrade && matchSection;
+            });
+
+            if (filteredKeys.length === 0) {
+                container.innerHTML = '<p class="text-xs opacity-60 text-center py-4 col-span-2">لا يوجد طلاب في السجل يتطابقون مع البحث.</p>';
+                return;
+            }
+
+            filteredKeys.forEach(key => {
+                const student = globalStudentsData[key];
+                const card = document.createElement('div');
+                card.className = 'theme-card p-4 rounded-2xl space-y-3 border border-yellow-500/20 relative';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start border-b border-current/10 pb-2">
+                        <div>
+                            <h4 class="font-extrabold text-sm text-yellow-400">${escapeStudentHtml(student.name)}</h4>
+                            <span class="text-[10px] opacity-75 bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20 inline-block mt-1">${escapeStudentHtml(student.grade)} - الشعبة ${escapeStudentHtml(student.section || 'غير محددة')}</span>
+                        </div>
+                        <button onclick="deleteStudent('${key}')" class="px-2 py-1 rounded bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold">حذف الطالب 🗑️</button>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <label class="text-[10px] opacity-60 block">📞 رقم ولي الأمر (خاص بالمدير):</label>
+                            <input type="text" id="phone-${key}" value="${escapeStudentHtml(student.guardianPhone || '')}" class="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[10px] opacity-60 block">📋 السلوك المدرسي والملاحظات:</label>
+                            <textarea id="behavior-${key}" class="w-full bg-black/40 border border-white/10 rounded-lg p-2 text-xs h-16 outline-none resize-none">${escapeStudentHtml(student.behaviorNotes || '')}</textarea>
+                        </div>
+                        <button onclick="updateStudent('${key}')" class="w-full py-1.5 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold text-[11px]">حفظ التعديلات سحابياً ✓</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateStudent(studentId) {
+            const newPhone = document.getElementById(`phone-${studentId}`).value.trim();
+            const newBehavior = document.getElementById(`behavior-${studentId}`).value.trim();
+
+            db.ref(`students/${studentId}`).update({
+                guardianPhone: newPhone,
+                behaviorNotes: newBehavior,
+                updatedAt: Date.now()
+            }).then(() => {
+                alert('تم حفظ وتحديث السيرة الذاتية للطالب في السحابة بنجاح!');
+            }).catch((err) => {
+                alert('حدث خطأ أثناء التحديث: ' + err.message);
+            });
+        }
+
+        function deleteStudent(studentId) {
+            if (confirm('هل أنت متأكد من حذف هذا الطالب من السجل النهائياً؟')) {
+                db.ref(`students/${studentId}`).remove().then(() => {
+                    alert('تم حذف الطالب من السجل بنجاح!');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
