@@ -1,0 +1,52 @@
+name: Build iOS Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Capacitor & Dependencies
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
+
+      - name: Initialize Capacitor
+        run: |
+          npx cap init "Salah Al-Din School" "com.salahaldin.app" --web-dir .
+
+      - name: Add iOS Platform
+        run: |
+          npx cap add ios
+
+      - name: Build Xcode Project
+        run: |
+          xcodebuild build \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Compress to IPA
+        run: |
+          mkdir -p Payload
+          mv ios/App/build/Release-iphoneos/App.app Payload/
+          zip -r Salah-Al-Din-School.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: iOS-App-Package
+          path: Salah-Al-Din-School.ipa
